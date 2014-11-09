@@ -4,7 +4,7 @@ namespace Patchwork\Tests\PHP;
 
 use Patchwork\PHP\Parser;
 
-class ConstantInlineTest extends \PHPUnit_Framework_TestCase
+class ConstantInlinerTest extends \PHPUnit_Framework_TestCase
 {
     protected function getParser($dump = false)
     {

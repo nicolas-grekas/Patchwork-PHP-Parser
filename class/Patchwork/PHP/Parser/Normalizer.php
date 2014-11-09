@@ -44,7 +44,6 @@ class Normalizer extends Parser
     {
         if ($is_fragment) return parent::getTokens($code, $is_fragment);
 
-
         if ($this->checkUtf8 && !preg_match('//u', $code))
         {
             $line = strtr($code, '?', '-');

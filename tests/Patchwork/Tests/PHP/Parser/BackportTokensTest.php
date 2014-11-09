@@ -30,6 +30,10 @@ __trait__
 insteadof
 yield
 finally
+**
+**=
+...
+??
 EOPHP;
 
         ob_start();
@@ -52,6 +56,10 @@ Line                    Source code Parsed code                    Token type(s)
    9                      insteadof                                T_INSTEADOF
   10                          yield                                T_YIELD
   11                        finally                                T_FINALLY
+  12                             **                                T_POW
+  13                            **=                                T_POW_EQUAL
+  14                            ...                                T_ELLIPSIS
+  15                             ??                                T_COALESCE
 
 EOTXT;
 

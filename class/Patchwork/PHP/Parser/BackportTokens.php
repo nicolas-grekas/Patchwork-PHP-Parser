@@ -28,6 +28,14 @@ defined('T_INSTEADOF') || Parser::createToken('T_INSTEADOF');
 defined('T_YIELD') || Parser::createToken('T_YIELD');
 defined('T_FINALLY') || Parser::createToken('T_FINALLY');
 
+// PHP 5.6 tokens
+defined('T_POW_EQUAL') || Parser::createToken('T_POW_EQUAL');
+defined('T_POW') || Parser::createToken('T_POW');
+defined('T_ELLIPSIS') || Parser::createToken('T_ELLIPSIS');
+
+// PHP 7 tokens
+defined('T_COALESCE') || Parser::createToken('T_COALESCE');
+
 /**
  * The BackportTokens parser backports tokens introduced since PHP 5.3
  *
@@ -79,9 +87,39 @@ class BackportTokens extends Parser
         $i = 0;
 
         if ($b)
+        {
             while (isset($code[++$i]))
+            {
                 if (T_STRING === $code[$i][0] && isset($b[$k = strtolower($code[$i][1])]) && T_OBJECT_OPERATOR !== $code[$i-1][0])
+                {
                     $code[$i][0] = $b[$k];
+                }
+                else if ('.' === $code[$i] && isset($code[$i+1], $code[$i+2]) && '.' === $code[$i+1] && '.' === $code[$i+2])
+                {
+                    $code[$i] = array(T_ELLIPSIS, '...');
+                    $code[$i+1] = array(T_WHITESPACE, '');
+                    $code[$i+2] = array(T_WHITESPACE, '');
+                }
+                else if ('*' === $code[$i] && isset($code[$i+1]))
+                {
+                    if ('*' === $code[$i+1])
+                    {
+                        $code[$i] = array(T_POW, '**');
+                        $code[$i+1] = array(T_WHITESPACE, '');
+                    }
+                    else if (T_MUL_EQUAL === $code[$i+1][0])
+                    {
+                        $code[$i] = array(T_POW_EQUAL, '**=');
+                        $code[$i+1] = array(T_WHITESPACE, '');
+                    }
+                }
+                else if ('?' === $code[$i] && isset($code[$i+1]) && '?' === $code[$i+1])
+                {
+                    $code[$i] = array(T_COALESCE, '??');
+                    $code[$i+1] = array(T_WHITESPACE, '');
+                }
+            }
+        }
 
         return $code;
     }
