@@ -21,8 +21,9 @@ class BinaryNumber extends Parser
     {
         if ($this->targetPhpVersionId < 50400 && stripos($code, '0b') && preg_match("'0[bB][01]'", $code))
         {
-            $this->unregister(array('catch0b' => T_LNUMBER));
-            $this->register(array('catch0b' => T_LNUMBER));
+            $c = array('catch0b' => PHP_VERSION_ID >= 50400 ? array(T_LNUMBER, T_DNUMBER) : T_LNUMBER);
+            $this->unregister($c);
+            $this->register($c);
         }
 
         return parent::getTokens($code, $is_fragment);
@@ -34,7 +35,7 @@ class BinaryNumber extends Parser
         {
             if (0 === stripos($token[1], '0b'))
             {
-                $token[1] = sprintf('0x%X', bindec(substr($token[1], 2)));
+                $token[1] = '0x'.base_convert(substr($token[1], 2), 2, 16);
             }
         }
         else if ('0' === $token[1] && $t =& $this->tokens)
@@ -43,7 +44,10 @@ class BinaryNumber extends Parser
 
             if (T_STRING === $m[0] && preg_match("'^[bB]([01]+)(.*)'", $m[1], $m))
             {
-                $token[1] = sprintf('0x%X', bindec($m[1]));
+                if (!is_int(bindec($m[1]))) {
+                    $token[0] = T_DNUMBER;
+                }
+                $token[1] = '0x'.base_convert($m[1], 2, 16);
 
                 if (empty($m[2])) unset($t[$this->index++]);
                 else $t[$this->index][1] = $m[2];

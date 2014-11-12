@@ -29,11 +29,38 @@ EOPHP;
 
         $out = <<<EOPHP
 <?php
-0x2AA;
-0x2AA;
+0x2aa;
+0x2aa;
 EOPHP;
 
         $this->assertSame( $out, $parser->parse($in) );
+        $this->assertSame( array(), $parser->getErrors() );
+    }
+
+    function testBigNumbers()
+    {
+        $parser = $this->getParser(true);
+
+        $in = <<<EOPHP
+<?php
+0b01010101010;
+0b1111111111111111111111111111111111111111111111111111111111111111;
+EOPHP;
+
+        ob_start();
+        echo $parser->parse($in);
+
+        $out = <<<EOTXT
+Line                    Source code Parsed code                    Token type(s)
+=================================================================================
+   1                         <?php⏎                                T_OPEN_TAG
+   2                  0b01010101010 0x2aa                          T_LNUMBER
+   3 0b111111111111111111111111111… 0x10000000000000000            T_DNUMBER
+   3                              ;                                ;
+
+EOTXT;
+
+        $this->assertSame( $out, ob_get_clean() );
         $this->assertSame( array(), $parser->getErrors() );
     }
 }
